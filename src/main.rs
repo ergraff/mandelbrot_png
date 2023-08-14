@@ -5,9 +5,8 @@ use std::path::Path;
 
 type PIXEL = Vec<u8>;
 
-const RESOLUTION: usize = 100;
-
-const ITERATIONS: usize = 10;
+const RESOLUTION: usize = 1000;
+const ITERATIONS: usize = 100;
 const LIMIT: f64 = 2.0;
 
 struct Image {
@@ -25,7 +24,6 @@ impl Image {
         let mut output = vec![];
         for row in self.image {
             for pixel in row {
-                // pixel.into_iter().map(|v| output.push(v));
                 for val in pixel {
                     output.push(val);
                 }
@@ -69,10 +67,12 @@ fn main() {
                 z = z * z + c;
                 let unbounded = z.norm() > LIMIT;
                 let bounded = (k == ITERATIONS - 1) && !unbounded;
-                match (unbounded, bounded) {
-                    (true, _) => image.image[im][re] = vec![255, 255, 255],
-                    (_, true) => image.image[im][re] = vec![0, 0, 0],
-                    _ => {}
+                if unbounded {
+                    image.image[im][re] = vec![255, 255, 255];
+                    break;
+                }
+                if bounded {
+                    image.image[im][re] = vec![0, 0, 0];
                 }
             }
         }
