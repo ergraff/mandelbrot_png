@@ -3,26 +3,21 @@ use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
 
-type PIXEL = [u8; 3];
-const _RED: PIXEL = [255, 0, 0];
-const _GREEN: PIXEL = [0, 255, 0];
-const _BLUE: PIXEL = [0, 0, 255];
-const BLACK: PIXEL = [0, 0, 0];
-const WHITE: PIXEL = [255, 255, 255];
+type PIXEL = Vec<u8>;
 
-const RESOLUTION: usize = 500;
+const RESOLUTION: usize = 100;
 
 const ITERATIONS: usize = 10;
 const LIMIT: f64 = 2.0;
 
 struct Image {
-    image: [[PIXEL; RESOLUTION]; RESOLUTION],
+    image: Vec<Vec<PIXEL>>,
 }
 
 impl Image {
     fn empty() -> Self {
         Image {
-            image: [[WHITE; RESOLUTION]; RESOLUTION],
+            image: vec![vec![vec![255, 255, 255]; RESOLUTION]; RESOLUTION],
         }
     }
 
@@ -30,7 +25,10 @@ impl Image {
         let mut output = vec![];
         for row in self.image {
             for pixel in row {
-                pixel.map(|v| output.push(v));
+                // pixel.into_iter().map(|v| output.push(v));
+                for val in pixel {
+                    output.push(val);
+                }
             }
         }
         output
@@ -43,7 +41,6 @@ fn main() {
     let file = File::create(path).unwrap();
 
     let ref mut w = BufWriter::new(file);
-
     let mut encoder = png::Encoder::new(w, RESOLUTION as u32, RESOLUTION as u32);
     encoder.set_color(png::ColorType::Rgb);
     encoder.set_depth(png::BitDepth::Eight);
@@ -58,8 +55,8 @@ fn main() {
     let mut writer = encoder.write_header().unwrap();
 
     // Create image
-    let step: f64 = 4.0 / RESOLUTION as f64;
     let mut image = Image::empty();
+    let step: f64 = 4.0 / RESOLUTION as f64;
     for re in 0..RESOLUTION {
         for im in 0..RESOLUTION {
             let r = -2.0 + (re as f64) * step;
@@ -73,8 +70,8 @@ fn main() {
                 let unbounded = z.norm() > LIMIT;
                 let bounded = (k == ITERATIONS - 1) && !unbounded;
                 match (unbounded, bounded) {
-                    (true, _) => image.image[im][re] = WHITE,
-                    (_, true) => image.image[im][re] = BLACK,
+                    (true, _) => image.image[im][re] = vec![255, 255, 255],
+                    (_, true) => image.image[im][re] = vec![0, 0, 0],
                     _ => {}
                 }
             }
