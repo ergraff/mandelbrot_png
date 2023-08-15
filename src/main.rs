@@ -1,4 +1,5 @@
 use num::complex::Complex;
+use std::f64::consts::PI;
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
@@ -6,7 +7,7 @@ use std::path::Path;
 type PIXEL = Vec<u8>;
 
 const ITERATIONS: usize = 50;
-const RESOLUTION: usize = 2000;
+const RESOLUTION: usize = 1000;
 const LIMIT_BOUNDED: f64 = 2.0;
 const LIMIT_RE: [i32; 2] = [-2, 1];
 const LIMIT_IM: [i32; 2] = [1, -1];
@@ -33,6 +34,16 @@ impl Image {
         }
         output
     }
+}
+
+fn pixel_color(strength: f64) -> PIXEL {
+    let rads = 2.0 * PI * strength;
+    let height_scaling = 255.0;
+    let width_scaling = 0.5;
+    let r = (height_scaling * (width_scaling * (rads - 0.0 * PI)).cos()) as u8;
+    let g = (height_scaling * (width_scaling * (rads - 1.0 * PI)).cos()) as u8;
+    let b = (height_scaling * (width_scaling * (rads - 2.0 * PI)).cos()) as u8;
+    vec![r, g, b]
 }
 
 fn main() {
@@ -81,9 +92,9 @@ fn main() {
                 let unbounded = z.norm() > LIMIT_BOUNDED;
                 let bounded = (k == ITERATIONS - 1) && !unbounded;
                 if unbounded {
-                    let strength = k as f64 / ITERATIONS as f64;
-                    let pixel_value = (strength * 255.0) as u8;
-                    image.image[im][re] = vec![pixel_value, pixel_value, pixel_value];
+                    let strength = k as f64 / 30.0;
+                    // let pixel_value = (strength * 255.0) as u8;
+                    image.image[im][re] = pixel_color(strength);
                     break;
                 }
                 if bounded {
