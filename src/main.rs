@@ -9,8 +9,8 @@ type PIXEL = Vec<u8>;
 const ITERATIONS: usize = 50;
 const RESOLUTION: usize = 1000;
 const LIMIT_BOUNDED: f64 = 2.0;
-const LIMIT_RE: [i32; 2] = [-2, 1];
-const LIMIT_IM: [i32; 2] = [1, -1];
+const LIMIT_RE: [f64; 2] = [-2.0, 1.0];
+const LIMIT_IM: [f64; 2] = [1.0, -1.0];
 
 struct Image {
     image: Vec<Vec<PIXEL>>,
@@ -19,7 +19,7 @@ struct Image {
 impl Image {
     fn empty(height: usize, width: usize) -> Self {
         Image {
-            image: vec![vec![vec![255, 255, 255]; height]; width],
+            image: vec![vec![vec![0, 0, 0]; height]; width],
         }
     }
 
@@ -48,16 +48,10 @@ fn pixel_color(strength: f64) -> PIXEL {
 
 fn main() {
     // Initialise image I/O
-    let sum_im = LIMIT_IM
-        .map(|v| v.abs() as usize)
-        .into_iter()
-        .sum::<usize>();
-    let sum_re = LIMIT_RE
-        .map(|v| v.abs() as usize)
-        .into_iter()
-        .sum::<usize>();
+    let sum_im = LIMIT_IM.map(|v| v.abs()).into_iter().sum::<f64>();
+    let sum_re = LIMIT_RE.map(|v| v.abs()).into_iter().sum::<f64>();
     let width = RESOLUTION;
-    let height = RESOLUTION * sum_im / sum_re;
+    let height = (RESOLUTION as f64 * sum_im / sum_re) as usize;
     let path = Path::new(r"image.png");
     let file = File::create(path).unwrap();
 
@@ -92,8 +86,7 @@ fn main() {
                 let unbounded = z.norm() > LIMIT_BOUNDED;
                 let bounded = (k == ITERATIONS - 1) && !unbounded;
                 if unbounded {
-                    let strength = k as f64 / 30.0;
-                    // let pixel_value = (strength * 255.0) as u8;
+                    let strength = k as f64 / (ITERATIONS as f64 / 2.0);
                     image.image[im][re] = pixel_color(strength);
                     break;
                 }
