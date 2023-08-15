@@ -5,7 +5,7 @@ use std::path::Path;
 
 type PIXEL = Vec<u8>;
 
-const ITERATIONS: usize = 100;
+const ITERATIONS: usize = 50;
 const RESOLUTION: usize = 2000;
 const LIMIT_BOUNDED: f64 = 2.0;
 const LIMIT_RE: [i32; 2] = [-2, 1];
@@ -81,7 +81,9 @@ fn main() {
                 let unbounded = z.norm() > LIMIT_BOUNDED;
                 let bounded = (k == ITERATIONS - 1) && !unbounded;
                 if unbounded {
-                    image.image[im][re] = vec![255, 255, 255];
+                    let strength = k as f64 / ITERATIONS as f64;
+                    let pixel_value = (strength * 255.0) as u8;
+                    image.image[im][re] = vec![pixel_value, pixel_value, pixel_value];
                     break;
                 }
                 if bounded {
