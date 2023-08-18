@@ -97,8 +97,6 @@ fn main() {
         }
     }
 
-    let data = image.flatten();
-
     // Write image
     let data = image.flatten();
     writer.write_image_data(&data).unwrap();
