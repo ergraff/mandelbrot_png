@@ -40,9 +40,9 @@ fn pixel_color(strength: f64) -> PIXEL {
     let rads = 2.0 * PI * strength;
     let height_scaling = 255.0;
     let width_scaling = 0.5;
-    let r = (height_scaling * (width_scaling * (rads - 0.0 * PI)).cos()) as u8;
+    let r = (height_scaling * (width_scaling * (rads - 2.0 * PI)).cos()) as u8;
     let g = (height_scaling * (width_scaling * (rads - 1.0 * PI)).cos()) as u8;
-    let b = (height_scaling * (width_scaling * (rads - 2.0 * PI)).cos()) as u8;
+    let b = (height_scaling * (width_scaling * (rads - 0.0 * PI)).cos()) as u8;
     vec![r, g, b]
 }
 
