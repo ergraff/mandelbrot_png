@@ -6,11 +6,11 @@ use std::path::Path;
 
 type Pixel = Vec<u8>;
 
-const ITERATIONS: usize = 50;
-const RESOLUTION: usize = 1000;
+const ITERATIONS: usize = 100;
+const RESOLUTION: usize = 2000;
 const LIMIT_BOUNDED: f64 = 2.0;
 const LIMIT_RE: [f64; 2] = [-2.0, 1.0];
-const LIMIT_IM: [f64; 2] = [1.0, -1.0];
+const LIMIT_IM: [f64; 2] = [1.2, -1.2];
 
 struct Image {
     image: Vec<Vec<Pixel>>,
