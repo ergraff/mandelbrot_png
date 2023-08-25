@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
 
-type PIXEL = Vec<u8>;
+type Pixel = Vec<u8>;
 
 const ITERATIONS: usize = 50;
 const RESOLUTION: usize = 1000;
@@ -13,7 +13,7 @@ const LIMIT_RE: [f64; 2] = [-2.0, 1.0];
 const LIMIT_IM: [f64; 2] = [1.0, -1.0];
 
 struct Image {
-    image: Vec<Vec<PIXEL>>,
+    image: Vec<Vec<Pixel>>,
 }
 
 impl Image {
@@ -36,7 +36,7 @@ impl Image {
     }
 }
 
-fn pixel_color(strength: f64) -> PIXEL {
+fn pixel_color(strength: f64) -> Pixel {
     let rads = 2.0 * PI * strength;
     let height_scaling = 255.0;
     let width_scaling = 0.5;
@@ -55,7 +55,7 @@ fn main() {
     let path = Path::new(r"image.png");
     let file = File::create(path).unwrap();
 
-    let ref mut w = BufWriter::new(file);
+    let w = &mut BufWriter::new(file);
     let mut encoder = png::Encoder::new(w, width as u32, height as u32);
     encoder.set_color(png::ColorType::Rgb);
     encoder.set_depth(png::BitDepth::Eight);
@@ -71,12 +71,12 @@ fn main() {
 
     // Create image
     let mut image = Image::empty(width, height);
-    let step_re: f64 = (sum_re as f64) / width as f64;
-    let step_im: f64 = (sum_im as f64) / height as f64;
+    let step_re: f64 = sum_re / width as f64;
+    let step_im: f64 = sum_im / height as f64;
     for re in 0..width {
         for im in 0..height {
-            let r = LIMIT_RE[0] as f64 + (re as f64) * step_re;
-            let i = LIMIT_IM[0] as f64 - (im as f64) * step_im;
+            let r = LIMIT_RE[0] + (re as f64) * step_re;
+            let i = LIMIT_IM[0] - (im as f64) * step_im;
 
             let mut z = Complex::new(0.0, 0.0);
             let c = Complex::new(r, i);
@@ -89,8 +89,7 @@ fn main() {
                     let strength = k as f64 / (ITERATIONS as f64 / 2.0);
                     image.image[im][re] = pixel_color(strength);
                     break;
-                }
-                if bounded {
+                } else if bounded {
                     image.image[im][re] = vec![0, 0, 0];
                 }
             }
