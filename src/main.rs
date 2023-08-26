@@ -3,11 +3,12 @@ use std::f64::consts::PI;
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
+use std::time::Instant;
 
 type Pixel = Vec<u8>;
 
 const ITERATIONS: usize = 100;
-const RESOLUTION: usize = 2000;
+const RESOLUTION: usize = 1000;
 const LIMIT_BOUNDED: f64 = 2.0;
 const LIMIT_RE: [f64; 2] = [-2.0, 1.0];
 const LIMIT_IM: [f64; 2] = [1.2, -1.2];
@@ -70,6 +71,7 @@ fn main() {
     let mut writer = encoder.write_header().unwrap();
 
     // Create image
+    let now = Instant::now();
     let mut image = Image::empty(width, height);
     let step_re: f64 = sum_re / width as f64;
     let step_im: f64 = sum_im / height as f64;
@@ -96,7 +98,13 @@ fn main() {
         }
     }
 
+    // Save elapsed time
+    let elapsed = now.elapsed();
+
     // Write image
     let data = image.flatten();
     writer.write_image_data(&data).unwrap();
+
+    // Print elapsed time
+    println!("Freshly made mandelbrot! Image generated in: {elapsed:.2?}");
 }
